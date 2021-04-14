@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: distroless-experiments
+   labels:
+      istio-injection: disabled
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: distroless-experiments-deployment
+  namespace: distroless-experiments
+spec:
+  selector:
+    matchLabels:
+      run: distroless-experiment-base
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      annotations:
+        rollme: {{ now | date "20060102150405"  | quote }} #forces the pod to rollover on every helm upgrade
+      labels:
+        run: distroless-experiment-base
+    spec:
+      containers:
+      - name: distroless-experiment-base
+        image: {{ .Values.image.repository }}
